@@ -42,3 +42,15 @@ services:
     container_name: travel_redis
     ports:
       - "6379:6379"
+
+  celery_worker:
+    build: .
+    container_name: travel_celery
+    command: celery -A app.celery_app worker --loglevel=info
+    depends_on:
+      - redis
+      - postgres
+    env_file:
+      - .env
+    volumes:
+      - .:/app
