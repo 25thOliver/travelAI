@@ -12,3 +12,4 @@ ollama
 redis
 celery
 python-dotenv
+httpx
