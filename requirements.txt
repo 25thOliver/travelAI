@@ -1,0 +1,14 @@
+# Tech stack
+fastapi
+uvicorn[standard]
+sqlalchemy
+asyncpg
+psycopg2-binary
+pydantic
+qdrant-client
+langchain
+langchain-community
+ollama
+redis
+celery
+python-dotenv
