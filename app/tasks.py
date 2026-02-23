@@ -9,7 +9,7 @@ from app.repositories.destination_repository import DestinationRepository
 def scrape_destinations():
     async def run():
         scraper = DestinationScraper()
-        data = await scraper.scrape_example()
+        data = await scraper.scrape_destinantions()
 
         async with AsyncSessionLocal() as db:
             repo = DestinationRepository(db)
