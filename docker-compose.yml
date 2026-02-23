@@ -1,0 +1,16 @@
+services:
+
+  api:
+    build: .
+    container_name: travel_api
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - qdrant
+      - redis
+      - ollama
+    env_file:
+      - .env
+    volumes:
+      - .:/app
