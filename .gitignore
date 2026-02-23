@@ -1,0 +1,89 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.env
+.venv/
+venv/
+ENV/
+env/
+pip-log.txt
+pip-delete-this-directory.txt
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# =========================
+# FastAPI / Uvicorn
+# =========================
+*.log
+*.sqlite3
+
+# =========================
+# Docker
+# =========================
+docker-compose.override.yml
+*.pid
+*.seed
+*.pid.lock
+*.env.local
+*.env.*.local
+
+# =========================
+# PostgreSQL
+# =========================
+postgres_data/
+*.dump
+
+# =========================
+# Qdrant
+# =========================
+qdrant_data/
+
+# =========================
+# Redis
+# =========================
+dump.rdb
+
+# =========================
+# Ollama
+# =========================
+ollama_data/
+
+# =========================
+# Celery
+# =========================
+celerybeat-schedule
+
+# =========================
+# IDEs
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+# OS Files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Testing / Coverage
+# =========================
+.coverage
+htmlcov/
+.pytest_cache/
+
+# =========================
+# Migrations (optional rule)
+# Uncomment if you auto-generate migrations
+# =========================
+# alembic/versions/*.py
