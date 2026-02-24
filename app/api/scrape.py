@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from app.services.scrape_service import ScrapeService
 
-router = APIRouter(prefix="/scrape", tag=["scrape"])
+router = APIRouter(prefix="/scrape", tags=["scrape"])
 scrape_service = ScrapeService()
 
 @router.post("/")
