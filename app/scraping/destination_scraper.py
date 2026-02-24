@@ -6,8 +6,7 @@ from app.scraping.base_scraper import BaseScraper
 
 
 class DestinationScraper(BaseScraper):
-    BASE_URL = "https://www.magicalkenya.com"
-    LIST_URL = "https://www.magicalkenya.com/places-to-visit/"
+    LIST_URL = "https://en.wikipedia.org/wiki/Tourism_in_Kenya"
 
     async def scrape_destinations(self) -> List[Dict]:
         html = await self.fetch(self.LIST_URL)
@@ -15,39 +14,35 @@ class DestinationScraper(BaseScraper):
 
         destinations: List[Dict] = []
 
-        # Each destination card
-        cards = soup.select("div.card")  # main destination cards
+        # Extract links inside main content area
+        content = soup.select_one("#mw-content-text")
+        if not content:
+            return destinations
 
-        for card in cards:
-            title_tag = card.select_one("h3.card-title")
-            description_tag = card.select_one("p.card-text")
-            link_tag = card.select_one("a")
+        links = content.select("a[href^='/wiki/']")
 
-            if not title_tag or not link_tag:
+        seen = set()
+
+        for link in links:
+            title = link.get_text(strip=True)
+            href = link.get("href")
+
+            if not title or ":" in href:
                 continue
 
-            title = title_tag.get_text(strip=True)
-            description = (
-                description_tag.get_text(strip=True)
-                if description_tag
-                else "No description available."
-            )
+            if title in seen:
+                continue
 
-            relative_url = link_tag.get("href")
-            source_url = (
-                relative_url
-                if relative_url.startswith("http")
-                else f"{self.BASE_URL}{relative_url}"
-            )
+            seen.add(title)
 
             destinations.append(
                 {
                     "title": title,
                     "location": "Kenya",
                     "category": "Tourism",
-                    "description": description,
-                    "source_url": source_url,
+                    "description": f"Wikipedia reference for {title}.",
+                    "source_url": f"https://en.wikipedia.org{href}",
                 }
             )
 
-        return destinations
+        return destinations[:20]  # limit for testing
