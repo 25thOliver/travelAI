@@ -3,7 +3,9 @@ from app.config import settings
 
 class LLMService:
     async def generate(self, prompt: str) -> str:
-        async with httpx.AsyncClient() as client:
+        timeout = httpx.Timeout(60.0)
+
+        async with httpx.AsyncClient(timeout=timeout) as client:
             response = await client.post(
                 f"{settings.ollama_base_url}/api/generate",
                 json={
