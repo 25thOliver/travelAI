@@ -17,15 +17,18 @@ async def semantic_search(query: str):
     query_vector = await embbedding_service.embed(query)
 
     # Retrieve similar destinations
-    results = vector_service.search(query_vector)
+    results = vector_service.search(query_vector, limit=3)
 
     # Build context
     context_blocks = []
-    for r in results:
-        payload = r.payload
+
+    for r in results[:3]:
+        payload = r.payload if hasattr(r, "payload") else r["payload"]
+
         context_blocks.append(
-            f"{payload['title']}: {payload['description']}"
+            payload.get("description", "")[:1000]  # limit each chunk
         )
+
     context = "\n\n".join(context_blocks)
 
     # Grounded prompt
