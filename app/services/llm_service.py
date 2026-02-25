@@ -12,7 +12,11 @@ class LLMService:
                     "model": "mistral",
                     "prompt": prompt,
                     "stream": False,
-                },
+                    "options": {
+                        "temperature": 0.3,
+                        "num_predict": 300
+                    }
+                }
             )
             response.raise_for_status()
             return response.json()["response"]
