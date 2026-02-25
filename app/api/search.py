@@ -1,6 +1,10 @@
 from fastapi import APIRouter
 from app.services.embedding_service import EmbeddingService
 from app.services.vector_service import VectorService
+from pydantic import BaseModel
+
+class SearchRequest(BaseModel):
+    query: str
 
 router = APIRouter(prefix="/search", tags=["search"])
 
