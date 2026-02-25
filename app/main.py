@@ -4,6 +4,7 @@ from app.api.chat import router as chat_router
 from app.api.scrape import router as scrape_router
 from app.db.base import Base
 from app.db.session import engine
+from app.services.vector_service import VectorService
 
 app = FastAPI(title="Travel AI Agent")
 
@@ -20,3 +21,6 @@ async def root():
 async def on_startup():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
+        vector_service = VectorService()
+        vector_service.create_collection()
