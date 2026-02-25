@@ -47,6 +47,9 @@ Answer clearly and concisely.
     answer = await llm_service.generate(prompt)
 
     return {
-        "answer": answer,
-        "sources": [r.payload for r in results],
-    }
+    "answer": answer,
+    "sources": [
+        r.payload if hasattr(r, "payload") else r.get("payload", {})
+        for r in results
+    ],
+}
