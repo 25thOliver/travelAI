@@ -35,8 +35,8 @@ class VectorService:
     def search(self, vector: list[float], limit: int = 5):
         response = self.client.query_points(
             collection_name=self.collection_name,
-            query_vector=vector,
+            query=vector,
             limit=limit,
         )
 
-        return response.point
+        return response.points
