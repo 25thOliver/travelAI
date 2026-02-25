@@ -8,7 +8,7 @@ class EmbeddingService:
             response = await client.post(
                 f"{settings.ollama_base_url}/api/embeddings",
                 json={
-                    "model": "mistral",
+                    "model": "nomic-embed-text",
                     "prompt": text
                 }
             )
