@@ -37,6 +37,14 @@ class VectorService:
             collection_name=self.collection_name,
             query=vector,
             limit=limit,
+            query_filter={
+                "must": [
+                    {
+                        "key": "location",
+                        "match": {"value": "Kenya"}
+                    }
+                ]
+            }
         )
 
         return response.points
