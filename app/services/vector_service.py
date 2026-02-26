@@ -12,13 +12,15 @@ class VectorService:
         self.collection_name = "destinations"
 
     def create_collection(self):
-        self.client.recreate_collection(
-            collection_name=self.collection_name,
-            vectors_config=VectorParams(
-                size=768,
-                distance=Distance.COSINE,
-            ),
-        )
+        existing = [c.name for c in self.client.get_collections().collections]
+        if self.collection_name not in existing:
+            self.client.create_collection(
+                collection_name=self.collection_name,
+                vectors_config=VectorParams(
+                    size=768,
+                    distance=Distance.COSINE,
+                ),
+            )
 
     def upsert(self, id: int, vector: list[float], payload: dict):
         self.client.upsert(
