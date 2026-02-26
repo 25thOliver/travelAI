@@ -1,5 +1,7 @@
 # Tech stack
 fastapi
+langchain-ollama
+langchain-qdrant
 uvicorn[standard]
 sqlalchemy
 asyncpg
