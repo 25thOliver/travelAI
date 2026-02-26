@@ -1,5 +1,5 @@
 import asyncio
-from langchain.tools import tools
+from langchain.tools import tool
 from app.services.embedding_service import EmbeddingService
 from app.services.vector_service import VectorService
 
