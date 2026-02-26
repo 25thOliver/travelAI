@@ -3,7 +3,7 @@ from langchain.agents import AgentExecutor, create_react_agent
 from langchain.memory import ConversationBufferWindowMemory
 from langchain import hub
 from app.agents.tools import search_destinations
-from app.config import settinggs
+from app.config import settings
 
 # One memory store per session, keyed by session_id
 _session_memories: dict[str, ConversationBufferWindowMemory] = {}
@@ -30,7 +30,7 @@ class TravelAgent:
 
     def _build_executor(self, session_id: str) -> AgentExecutor:
         memory = _get_memory(session_id)
-        agent = create_recat_agent(
+        agent = create_react_agent(
             llm=self.llm,
             tools=self.tools,
             prompt=self.prompt,
@@ -51,7 +51,7 @@ class TravelAgent:
 
         # Extract source URLs from tool call outputs
         sources = []
-        for step in result.get("internediate_steps", []):
+        for step in result.get("intermediate_steps", []):
             if len(step) == 2:
                 tool_output = step[1]
                 if isinstance(tool_output, str):
