@@ -33,20 +33,23 @@ async def semantic_search(query: str):
 
     # Grounded prompt
     prompt = f"""
-You are a Kenya travel expert AI.
+    You are a Kenya travel assistant.
 
-ONLY answer using the information in the context.
-If the answer is not found in the context, say:
-"I do not have enough information in the database to answer that."
+    Answer the question ONLY using the information in the provided context.
 
-Context:
-{context}
+    If the information is not present in the context, respond with:
+    "I do not have enough information in the database."
 
-Question:
-{query}
+    DO NOT use outside knowledge.
 
-Answer clearly and concisely.
-"""
+    Context:
+    {context}
+
+    Question:
+    {query}
+
+    Answer:
+    """
 
     # Generate answer
     answer = await llm_service.generate(prompt)
