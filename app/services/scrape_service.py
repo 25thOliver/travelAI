@@ -22,7 +22,7 @@ TARGET_URLS = [
 def chunk_text(text: str, chunk_size: int = 350):
     words = text.split()
     for i in range(0, len(words), chunk_size):
-        yield " ".jion(words[i:i + chunk_size])
+        yield " ".join(words[i:i + chunk_size])
 
 
 class ScrapeService:
@@ -59,7 +59,7 @@ class ScrapeService:
 
                         payload = {
                             "title": title,
-                            "source_url": url,
+                            "source": url,
                             "location": "Kenya",
                             "type": "national_park",
                             "description": chunk,
