@@ -3,7 +3,7 @@ from app.config import settings
 
 class LLMService:
     async def generate(self, prompt: str) -> str:
-        timeout = httpx.Timeout(60.0)
+        timeout = httpx.Timeout(120.0)
 
         async with httpx.AsyncClient(timeout=timeout) as client:
             response = await client.post(
