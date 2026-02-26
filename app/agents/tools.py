@@ -30,7 +30,7 @@ def _search_destinations_sync(query: str) -> str:
     return asyncio.run(_run())
 
 @tool
-def searc_destinations(query: str) -> str:
+def search_destinations(query: str) -> str:
     """
     Search the Kenya travel database for destinations, national parks, safaris,
     beaches, or activities matching the user's query.
