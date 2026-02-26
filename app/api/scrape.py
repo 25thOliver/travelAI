@@ -6,5 +6,5 @@ scrape_service = ScrapeService()
 
 @router.post("/")
 async def scrape():
-    count = await scrape_service.scrape_and_store()
+    count = await scrape_service.scrape()
     return {"stored_records": count}
