@@ -33,9 +33,11 @@ async def semantic_search(query: str):
 
     # Grounded prompt
     prompt = f"""
-You are a travel assistant for Kenya.
+You are a Kenya travel expert AI.
 
-Use ONLY the information below to answer the user's question.
+ONLY answer using the information in the context.
+If the answer is not found in the context, say:
+"I do not have enough information in the database to answer that."
 
 Context:
 {context}
@@ -49,10 +51,18 @@ Answer clearly and concisely.
     # Generate answer
     answer = await llm_service.generate(prompt)
 
+    
+    # Extract unique source URLs
+    sources = []
+
+    for r in results:
+        payload = r.payload if hasattr(r, "payload") else r.get("payload", {})
+        source_url = payload.get("source")
+
+        if source_url and source_url not in sources:
+            sources.append(source_url)
+
     return {
-    "answer": answer,
-    "sources": [
-        r.payload if hasattr(r, "payload") else r.get("payload", {})
-        for r in results
-    ],
-}
+        "answer": answer,
+        "sources": sources
+    }
