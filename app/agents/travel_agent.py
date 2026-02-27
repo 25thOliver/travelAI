@@ -1,12 +1,12 @@
-from langchain_ollama import OllamaLLM
-from langchain.agents import AgentExecutor, create_react_agent
+from langchain_ollama import OllamaLLM, OllamaEmbeddings
+from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferWindowMemory
-from langchain import hub
-from app.agents.tools import search_destinations
+from langchain_qdrant import QdrantVectorStore
+from qdrant_client import QdrantClient
 from app.config import settings
 
-# One memory store per session, keyed by session_id
 _session_memories: dict[str, ConversationBufferWindowMemory] = {}
+
 
 def _get_memory(session_id: str) -> ConversationBufferWindowMemory:
     if session_id not in _session_memories:
@@ -14,8 +14,10 @@ def _get_memory(session_id: str) -> ConversationBufferWindowMemory:
             k=5,
             memory_key="chat_history",
             return_messages=True,
+            output_key="answer",
         )
     return _session_memories[session_id]
+
 
 class TravelAgent:
     def __init__(self):
@@ -25,40 +27,48 @@ class TravelAgent:
             temperature=0.3,
         )
 
-        self.tools = [search_destinations]
-        self.prompt = hub.pull("hwchase17/react-chat")
-
-    def _build_executor(self, session_id: str) -> AgentExecutor:
-        memory = _get_memory(session_id)
-        agent = create_react_agent(
-            llm=self.llm,
-            tools=self.tools,
-            prompt=self.prompt,
+        embeddings = OllamaEmbeddings(
+            base_url=settings.ollama_base_url,
+            model="nomic-embed-text",
         )
-        return AgentExecutor(
-            agent=agent,
-            tools=self.tools,
+
+        client = QdrantClient(
+            host=settings.qdrant_host,
+            port=settings.qdrant_port,
+        )
+
+        # LangChain-native Qdrant wrapper; content_payload_key tells it
+        # which field in our payload is the actual text
+        self.vectorstore = QdrantVectorStore(
+            client=client,
+            collection_name="destinations",
+            embedding=embeddings,
+            content_payload_key="description",
+        )
+
+    def _build_chain(self, session_id: str) -> ConversationalRetrievalChain:
+        memory = _get_memory(session_id)
+        retriever = self.vectorstore.as_retriever(search_kwargs={"k": 3})
+
+        return ConversationalRetrievalChain.from_llm(
+            llm=self.llm,
+            retriever=retriever,
             memory=memory,
+            return_source_documents=True,
             verbose=True,
-            handle_parsing_errors=True,
-            max_iterations=5,
         )
 
     async def chat(self, session_id: str, message: str) -> dict:
-        executor = self._build_executor(session_id)
-        result = await executor.ainvoke({"input": message})
-        output = result.get("output", "")
+        chain = self._build_chain(session_id)
+        result = await chain.ainvoke({"question": message})
 
-        # Extract source URLs from tool call outputs
+        output = result.get("answer", "")
+
+        # Source documents are returned natively; no manual parsing needed
         sources = []
-        for step in result.get("intermediate_steps", []):
-            if len(step) == 2:
-                tool_output = step[1]
-                if isinstance(tool_output, str):
-                    for line in tool_output.split("\n"):
-                        if line.startswith("Source: ") and line [8:].strip():
-                            url = line[8:].strip()
-                            if url not in sources:
-                                sources.append(url)
+        for doc in result.get("source_documents", []):
+            source = doc.metadata.get("source", "")
+            if source and source not in sources:
+                sources.append(source)
 
         return {"answer": output, "sources": sources}
