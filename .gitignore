@@ -83,6 +83,17 @@ htmlcov/
 .pytest_cache/
 
 # =========================
+# Frontend (track folder; ignore deps & build)
+# =========================
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+frontend/npm-debug.log*
+frontend/.vite/
+
+# =========================
 # Migrations (optional rule)
 # Uncomment if you auto-generate migrations
 # =========================
