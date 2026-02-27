@@ -1,10 +1,14 @@
 import asyncio
+from concurrent.futures import ThreadPoolExecutor
 from langchain.tools import tool
 from app.services.embedding_service import EmbeddingService
 from app.services.vector_service import VectorService
 
 embedding_service = EmbeddingService()
 vector_service = VectorService()
+
+_executor = ThreadPoolExecutor(max_workers=4)
+
 
 def _search_destinations_sync(query: str) -> str:
     async def _run():
@@ -27,7 +31,10 @@ def _search_destinations_sync(query: str) -> str:
 
         return "\n\n---\n\n".join(output_lines)
 
-    return asyncio.run(_run())
+    # Submit to a separate thread with its own event loop
+    future = _executor.submit(asyncio.run, _run())
+    return future.result()
+
 
 @tool
 def search_destinations(query: str) -> str:
