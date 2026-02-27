@@ -29,6 +29,6 @@ async def agent_chat(request: AgentRequest) -> AgentResponse:
         "session_id": request.session_id,
         "message": request.message,
         "answer_preview": result["answer"][:80],
-        "sources_count": result["sources"],
+        "sources_count": len(result["sources"]),
     }))
     return AgentResponse(answer=result["answer"], sources=result["sources"])
