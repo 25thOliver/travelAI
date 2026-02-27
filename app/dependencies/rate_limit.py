@@ -15,7 +15,7 @@ def _get_redis_client() -> redis.Redis:
 def _rate_limit_key(session_id: str) -> str:
     return f"rate_limit:agent_chat:{session_id}"
 
-def check_rate_limit(session_id: Optional[str]) -> Nonee:
+def check_rate_limit(session_id: Optional[str]) -> None:
     # Raises a ValueError if the client exceeds the limit.
     if not session_id:
         return
