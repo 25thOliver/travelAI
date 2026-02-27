@@ -1,7 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from app.services.embedding_service import EmbeddingService
 from app.services.vector_service import VectorService
 from app.services.llm_service import LLMService
+from app.dependencies.auth import require_api_key
+
 
 
 router = APIRouter(prefix="/search", tags=["search"])
@@ -11,7 +13,7 @@ vector_service = VectorService()
 llm_service = LLMService()
 
 
-@router.post("/")
+@router.post("/", dependencies=[Depends(require_api_key)])
 async def semantic_search(query: str):
     # Embed user query
     query_vector = await embbedding_service.embed(query)
@@ -22,8 +24,11 @@ async def semantic_search(query: str):
     # Build context
     context_blocks = []
 
-    for r in results[:3]:
-        payload = r.payload if hasattr(r, "payload") else r["payload"]
+    print("RESULT COUNT:", len(results))
+
+    for r in results:
+        payload = r.payload if hasattr(r, "payload") else r.get("payload", {})
+        print("PAYLOAD:", payload)
 
         context_blocks.append(
             payload.get("description", "")[:1000]  # limit each chunk
