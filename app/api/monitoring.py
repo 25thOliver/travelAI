@@ -4,6 +4,7 @@ from fastapi import APIRouter
 from app.db.session import engine
 from app.config import settings
 import redis
+from sqlalchemy import text
 
 router = APIRouter(prefix="/monitoring", tags=["monitoring"])
 
@@ -17,7 +18,7 @@ async def monitoring_status():
     db_ok = False
     try:
         async with engine.begin() as conn:
-            await conn.execute("SELECT 1")
+            await conn.execute(text("SELECT 1"))
         db_ok = True
     except Exception:
         db_ok = False
