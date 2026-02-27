@@ -11,7 +11,7 @@ _session_memories: dict[str, ConversationBufferWindowMemory] = {}
 def _get_memory(session_id: str) -> ConversationBufferWindowMemory:
     if session_id not in _session_memories:
         _session_memories[session_id] = ConversationBufferWindowMemory(
-            k=5,
+            k=3,
             memory_key="chat_history",
             return_messages=True,
             output_key="answer",
@@ -23,8 +23,9 @@ class TravelAgent:
     def __init__(self):
         self.llm = OllamaLLM(
             base_url=settings.ollama_base_url,
-            model="mistral",
+            model="llama3.2:3b",
             temperature=0.3,
+            num_predict=128,
         )
 
         embeddings = OllamaEmbeddings(
@@ -48,7 +49,7 @@ class TravelAgent:
 
     def _build_chain(self, session_id: str) -> ConversationalRetrievalChain:
         memory = _get_memory(session_id)
-        retriever = self.vectorstore.as_retriever(search_kwargs={"k": 3})
+        retriever = self.vectorstore.as_retriever(search_kwargs={"k": 2})
 
         return ConversationalRetrievalChain.from_llm(
             llm=self.llm,
