@@ -1,3 +1,4 @@
+from app import dependencies
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from app.agents.travel_agent import TravelAgent
@@ -11,6 +12,10 @@ travel_agent = TravelAgent()
 class AgentRequest(BaseModel):
     session_id: str
     message: str
+
+class RateLimitTestResponse(BaseModel):
+    ok: bool
+    remaining_window_seconds: int | None = None
 
 class AgentResponse(BaseModel):
     answer: str
@@ -41,3 +46,15 @@ async def agent_chat(request: AgentRequest) -> AgentResponse:
     }), flush=True)
 
     return AgentResponse(answer=result["answer"], sources=result["sources"])
+
+
+@router.get("/rate-test", response_model=RateLimitTestResponse, dependencies=[Depends(require_api_key)])
+async def rate_test(session_id: str) -> RateLimitTestResponse:
+    try:
+        check_rate_limit(session_id)
+        return RateLimitTestResponse(ok=True, remaining_window_seconds=None)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=str(e),
+        )
