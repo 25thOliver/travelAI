@@ -63,6 +63,16 @@ services:
     volumes:
       - ollama_data:/root/.ollama
 
+  nginx:
+    image: nginx:alpine
+    container_name: travel_nginx
+    depends_on:
+      - api
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+
 volumes:
   postgres_data:
   qdrant_data:
