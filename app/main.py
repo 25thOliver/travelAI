@@ -7,20 +7,8 @@ from app.db.session import engine
 from app.services.vector_service import VectorService
 from app.api.search import router as search_router
 from app.api.agent import router as agent_router
-import logging
 import json
 import time
-
-# Logger setup
-logger = logging.getLogger("travel_ai")
-logger.setLevel(logging.INFO)
-
-handler = logging.StreamHandler()
-handler.setFormatter(logging.Formatter("%(message)s"))
-
-logger.handlers.clear()
-logger.addHandler(handler)
-logger.propagate = False
 
 
 app = FastAPI(title="Travel AI Agent")
@@ -41,7 +29,7 @@ async def log_requests(request: Request, call_next):
             "status_code": response.status_code if response else None,
             "process_time_ms": process_time_ms,
         }
-        logger.info(json.dumps(log_payload))
+        print(json.dumps(log_payload), flush=True)
 
 app.include_router(health_router)
 app.include_router(chat_router)
