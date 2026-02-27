@@ -6,8 +6,8 @@ import redis
 
 from app.config import settings
 
-RATE_LIMIT_WINDOW_SECONDS = 60
-RATE_LIMIT_MAX_REQUESTS = 5
+RATE_LIMIT_WINDOW_SECONDS = 10
+RATE_LIMIT_MAX_REQUESTS = 3
 
 def _get_redis_client() -> redis.Redis:
     return redis.from_url(settings.redis_url, decode_responses=True)
