@@ -42,7 +42,7 @@ class VectorService:
             query_filter={
                 "must": [
                     {
-                        "key": "location",
+                        "key": "country",
                         "match": {"value": "Kenya"}
                     }
                 ]
