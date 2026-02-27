@@ -9,10 +9,11 @@ class Settings(BaseSettings):
     qdrant_host: str
     qdrant_port: int
     ollama_base_url: str
+    api_key: str
 
     model_config = SettingsConfigDict(
         env_file=".env",
-        extra="ignore",  # prevents crashes if new vars are added later
+        extra="ignore",
     )
 
 
