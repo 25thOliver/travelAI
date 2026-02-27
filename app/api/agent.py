@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from app.agents.travel_agent import TravelAgent
 from app.dependencies.auth import require_api_key
 import json
+from app.dependencies.rate_limit import check_rate_limit
 
 router = APIRouter(prefix="/agent", tags=["agent"])
 travel_agent = TravelAgent()
@@ -17,10 +18,20 @@ class AgentResponse(BaseModel):
 
 @router.post("/chat", response_model=AgentResponse, dependencies=[Depends(require_api_key)])
 async def agent_chat(request: AgentRequest) -> AgentResponse:
+    try:
+        check_rate_limit(request.session_id)
+    except ValueError as e:
+        # e.args[0] contains our JSON details string
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=str(e),
+        )
+
     result = await travel_agent.chat(
         session_id=request.session_id,
         message=request.message,
     )
+
     print(json.dumps({
         "event": "agent_chat",
         "session_id": request.session_id,
@@ -28,4 +39,5 @@ async def agent_chat(request: AgentRequest) -> AgentResponse:
         "answer_preview": result["answer"][:80],
         "sources_count": len(result["sources"]),
     }), flush=True)
+
     return AgentResponse(answer=result["answer"], sources=result["sources"])
