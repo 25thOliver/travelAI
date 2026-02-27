@@ -13,10 +13,14 @@ import time
 
 # Logger setup
 logger = logging.getLogger("travel_ai")
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(message)s",
-)
+logger.setLevel(logging.INFO)
+
+handler = logging.StreamHandler()
+handler.setFormatter(logging.Formatter("%(message)s"))
+
+logger.handlers.clear()
+logger.addHandler(handler)
+logger.propagate = False
 
 
 app = FastAPI(title="Travel AI Agent")
