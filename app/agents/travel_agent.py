@@ -32,7 +32,7 @@ class TravelAgent:
             model="nomic-embed-text",
         )
 
-        client = QdrantClient(
+        self.qdrant_client = QdrantClient(
             host=settings.qdrant_host,
             port=settings.qdrant_port,
         )
@@ -40,7 +40,7 @@ class TravelAgent:
         # LangChain-native Qdrant wrapper; content_payload_key tells it
         # which field in our payload is the actual text
         self.vectorstore = QdrantVectorStore(
-            client=client,
+            client=self.qdrant_client,
             collection_name="destinations",
             embedding=embeddings,
             content_payload_key="description",
