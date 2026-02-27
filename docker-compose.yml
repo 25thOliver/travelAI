@@ -1,7 +1,7 @@
 services:
 
   api:
-    build: .
+    build: ./backend
     container_name: travel_api
     ports:
       - "8000:8000"
@@ -13,7 +13,7 @@ services:
     env_file:
       - .env
     volumes:
-      - .:/app
+      - ./backend:/app
 
   postgres:
     image: postgres:15
@@ -36,7 +36,6 @@ services:
     volumes:
       - qdrant_data:/qdrant/storage
 
-  
   redis:
     image: redis:7
     container_name: travel_redis
@@ -44,7 +43,7 @@ services:
       - "6379:6379"
 
   celery_worker:
-    build: .
+    build: ./backend
     container_name: travel_celery
     command: celery -A app.celery_app worker --loglevel=info
     depends_on:
@@ -53,7 +52,7 @@ services:
     env_file:
       - .env
     volumes:
-      - .:/app
+      - ./backend:/app
 
   ollama:
     image: ollama/ollama:latest
@@ -63,11 +62,22 @@ services:
     volumes:
       - ollama_data:/root/.ollama
 
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: ""
+        VITE_API_KEY: ""
+    container_name: travel_frontend
+    ports:
+      - "3000:3000"
+
   nginx:
     image: nginx:alpine
     container_name: travel_nginx
     depends_on:
       - api
+      - frontend
     ports:
       - "80:80"
     volumes:
