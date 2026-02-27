@@ -9,9 +9,12 @@ from app.api.search import router as search_router
 from app.api.agent import router as agent_router
 import json
 import time
+from app.api.monitoring import router as monitoring_router
 
 
 app = FastAPI(title="Travel AI Agent")
+
+APP_START_TIME = time.time()
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
@@ -36,6 +39,7 @@ app.include_router(chat_router)
 app.include_router(scrape_router)
 app.include_router(search_router)
 app.include_router(agent_router)
+app.include_router(monitoring_router)
 
 @app.get("/")
 async def root():
