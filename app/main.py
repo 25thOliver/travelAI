@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from app.api.health import router as health_router
 from app.api.chat import router as chat_router
 from app.api.scrape import router as scrape_router
@@ -7,8 +7,37 @@ from app.db.session import engine
 from app.services.vector_service import VectorService
 from app.api.search import router as search_router
 from app.api.agent import router as agent_router
+import logging
+import json
+import time
+
+# Logger setup
+logger = logging.getLogger("travel_ai")
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(message)s",
+)
+
 
 app = FastAPI(title="Travel AI Agent")
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start = time.time()
+    response = None
+    try:
+        response = await call_next(request)
+        return response
+    finally:
+        process_time_ms = int((time.time() - start) * 1000)
+        log_payload = {
+            "event": "http_request",
+            "method": request.method,
+            "path": request.url.path,
+            "status_code": response.status_code if response else None,
+            "process_time_ms": process_time_ms,
+        }
+        logger.info(json.dumps(log_payload))
 
 app.include_router(health_router)
 app.include_router(chat_router)
