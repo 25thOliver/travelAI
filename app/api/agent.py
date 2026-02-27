@@ -1,6 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from app.agents.travel_agent import TravelAgent
+from app.dependencies.auth import require_api_key
 
 router = APIRouter(prefix="/agent", tags=["agent"])
 travel_agent = TravelAgent()
@@ -13,7 +14,7 @@ class AgentResponse(BaseModel):
     answer: str
     sources: list[str]
 
-@router.post("/chat", response_model=AgentResponse)
+@router.post("/chat", response_model=AgentResponse, dependencies=[Depends(require_api_key)])
 async def agent_chat(request: AgentRequest) -> AgentResponse:
     result = await travel_agent.chat(
         session_id=request.session_id,
