@@ -64,11 +64,20 @@ class TravelAgent:
 
         output = result.get("answer", "")
 
-        # Source documents are returned natively; no manual parsing needed
+        # langchain_qdrant only returns _id in metadata
         sources = []
         for doc in result.get("source_documents", []):
-            source = doc.metadata.get("source", "")
-            if source and source not in sources:
-                sources.append(source)
+            doc_id = doc.metadata.get("_id")
+            if doc_id is not None:
+                points = self.qdrant_client.retrieve(
+                    collection_name="destinations",
+                    ids=[doc_id],
+                    with_payload=["source"],
+                )
+                if points and points[0].payload:
+                    source = points[0].payload.get("source", "")
+                    if source and source not in sources:
+                        sources.append(source)
 
         return {"answer": output, "sources": sources}
+
