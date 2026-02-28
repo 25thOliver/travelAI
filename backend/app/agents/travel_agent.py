@@ -67,6 +67,8 @@ class TravelAgent:
             embedding=embeddings,
             content_payload_key="description",
         )
+
+    def _build_chain(self, session_id: str) -> ConversationalRetrievalChain:
         # Return cached chain if available
         if session_id in _session_chains:
             return _session_chains[session_id]
@@ -97,6 +99,14 @@ Provide a helpful, specific response based on the context above."""
             return_source_documents=True,
             verbose=False,
             combine_docs_chain_kwargs={"prompt": prompt_template},
+        )
+        
+        # Cache the chain for this session
+        _session_chains[session_id] = chain
+        return chain
+
+    async def chat(self, session_id: str, message: str) -> dict:
+        chain = self._build_chain(session_id)
         
         try:
             result = await chain.ainvoke(
@@ -108,16 +118,6 @@ Provide a helpful, specific response based on the context above."""
                 "answer": f"Error processing your request: {str(e)}",
                 "sources": []
             }
-        
-        # Cache the chain for this session
-        _session_chains[session_id] = chain
-        return chain   verbose=True,
-            combine_docs_chain_kwargs={"prompt": prompt_template},
-        )
-
-    async def chat(self, session_id: str, message: str) -> dict:
-        chain = self._build_chain(session_id)
-        result = await chain.ainvoke({"question": message})
 
         output = result.get("answer", "")
 
