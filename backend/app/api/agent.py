@@ -27,37 +27,36 @@ async def agent_chat(request: AgentRequest) -> AgentResponse:
     try:
         check_rate_limit(request.session_id)
     except ValueError as e:
-        # e.args[0] contains our JSON details string
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail=str(e),
         )
 
     try:
-        # 45 second timeout for the entire chat operation
+        # 90 second timeout - plenty of time for LLM response
         result = await asyncio.wait_for(
             travel_agent.chat(
                 session_id=request.session_id,
                 message=request.message,
             ),
-            timeout=45.0
+            timeout=90.0
         )
     except asyncio.TimeoutError:
         raise HTTPException(
             status_code=status.HTTP_504_GATEWAY_TIMEOUT,
-            detail="Response took too long to generate. Please try a simpler question.",
+            detail="LLM response took too long. Please try a simpler question.",
         )
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error processing request: {str(e)}",
+            detail=f"Error: {str(e)}",
         )
 
     print(json.dumps({
         "event": "agent_chat",
         "session_id": request.session_id,
         "message": request.message,
-        "answer_preview": result["answer"][:80],
+        "answer_preview": result["answer"][:80] if result["answer"] else "",
         "sources_count": len(result["sources"]),
     }), flush=True)
 
