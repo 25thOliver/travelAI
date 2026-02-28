@@ -7,6 +7,7 @@ from qdrant_client import QdrantClient
 from app.config import settings
 
 _session_memories: dict[str, ConversationBufferWindowMemory] = {}
+_session_chains: dict[str, ConversationalRetrievalChain] = {}
 
 SYSTEM_PROMPT = """You are a knowledgeable and enthusiastic travel guide expert for Kenya. Your role is to:
 
@@ -43,7 +44,9 @@ class TravelAgent:
             base_url=settings.ollama_base_url,
             model="llama3.2:3b",
             temperature=0.2,
-            num_predict=512,
+            num_predict=250,
+            top_p=0.8,
+            top_k=40,
         )
 
         embeddings = OllamaEmbeddings(
@@ -64,10 +67,12 @@ class TravelAgent:
             embedding=embeddings,
             content_payload_key="description",
         )
-
-    def _build_chain(self, session_id: str) -> ConversationalRetrievalChain:
+        # Return cached chain if available
+        if session_id in _session_chains:
+            return _session_chains[session_id]
+        
         memory = _get_memory(session_id)
-        retriever = self.vectorstore.as_retriever(search_kwargs={"k": 5})
+        retriever = self.vectorstore.as_retriever(search_kwargs={"k": 3})
 
         # Custom prompt template with system instructions
         prompt_template = PromptTemplate(
@@ -85,12 +90,28 @@ User question: {question}
 Provide a helpful, specific response based on the context above."""
         )
 
-        return ConversationalRetrievalChain.from_llm(
+        chain = ConversationalRetrievalChain.from_llm(
             llm=self.llm,
             retriever=retriever,
             memory=memory,
             return_source_documents=True,
-            verbose=True,
+            verbose=False,
+            combine_docs_chain_kwargs={"prompt": prompt_template},
+        
+        try:
+            result = await chain.ainvoke(
+                {"question": message},
+                config={"timeout": 60}  # 60 second timeout per request
+            )
+        except Exception as e:
+            return {
+                "answer": f"Error processing your request: {str(e)}",
+                "sources": []
+            }
+        
+        # Cache the chain for this session
+        _session_chains[session_id] = chain
+        return chain   verbose=True,
             combine_docs_chain_kwargs={"prompt": prompt_template},
         )
 
