@@ -110,18 +110,10 @@ Answer:"""
         chain = self._build_chain(session_id)
         
         try:
-            result = await chain.ainvoke(
-                {"question": message},
-                config={"timeout": 30}  # 30 second timeout per request
-            )
-        except asyncio.TimeoutError:
-            return {
-                "answer": "Response generation timed out. The query may be too complex.",
-                "sources": []
-            }
+            result = await chain.ainvoke({"question": message})
         except Exception as e:
             return {
-                "answer": f"Error processing your request: {str(e)}",
+                "answer": f"Error: {str(e)}",
                 "sources": []
             }
 
@@ -132,15 +124,18 @@ Answer:"""
         for doc in result.get("source_documents", []):
             doc_id = doc.metadata.get("_id")
             if doc_id is not None:
-                points = self.qdrant_client.retrieve(
-                    collection_name="destinations",
-                    ids=[doc_id],
-                    with_payload=["source"],
-                )
-                if points and points[0].payload:
-                    source = points[0].payload.get("source", "")
-                    if source and source not in sources:
-                        sources.append(source)
+                try:
+                    points = self.qdrant_client.retrieve(
+                        collection_name="destinations",
+                        ids=[doc_id],
+                        with_payload=["source"],
+                    )
+                    if points and points[0].payload:
+                        source = points[0].payload.get("source", "")
+                        if source and source not in sources:
+                            sources.append(source)
+                except:
+                    pass
 
         return {"answer": output, "sources": sources}
 
