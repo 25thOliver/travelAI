@@ -22,6 +22,7 @@ TARGET_URLS = [
     ("https://en.wikipedia.org/wiki/Samburu_National_Reserve",    "Samburu National Reserve",  "Samburu"),
     # Beaches & Coast
     ("https://en.wikipedia.org/wiki/Diani_Beach",                 "Diani Beach",               "Kwale"),
+    ("https://en.wikipedia.org/wiki/Watamu",                      "Watamu Beach",              "Kilifi"),
     ("https://en.wikipedia.org/wiki/Lamu",                        "Lamu Island",               "Lamu"),
     # Conservancies
     ("https://en.wikipedia.org/wiki/Ol_Pejeta_Conservancy",       "Ol Pejeta Conservancy",     "Laikipia"),
