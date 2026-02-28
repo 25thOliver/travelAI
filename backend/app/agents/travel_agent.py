@@ -5,6 +5,7 @@ from langchain_qdrant import QdrantVectorStore
 from langchain.prompts import PromptTemplate
 from qdrant_client import QdrantClient
 from app.config import settings
+import asyncio
 
 _session_memories: dict[str, ConversationBufferWindowMemory] = {}
 _session_chains: dict[str, ConversationalRetrievalChain] = {}
@@ -42,11 +43,11 @@ class TravelAgent:
     def __init__(self):
         self.llm = OllamaLLM(
             base_url=settings.ollama_base_url,
-            model="llama3.2:3b",
-            temperature=0.2,
-            num_predict=250,
-            top_p=0.8,
-            top_k=40,
+            model="mistral:latest",
+            temperature=0.1,
+            num_predict=200,
+            top_p=0.7,
+            top_k=30,
         )
 
         embeddings = OllamaEmbeddings(
@@ -74,22 +75,22 @@ class TravelAgent:
             return _session_chains[session_id]
         
         memory = _get_memory(session_id)
-        retriever = self.vectorstore.as_retriever(search_kwargs={"k": 3})
+        retriever = self.vectorstore.as_retriever(search_kwargs={"k": 2})
 
-        # Custom prompt template with system instructions
+        # Simplified prompt template for faster generation
         prompt_template = PromptTemplate(
             input_variables=["context", "chat_history", "question"],
-            template=SYSTEM_PROMPT + """
+            template="""You are a travel expert for Kenya. Answer the question directly and concisely using the provided context.
 
-Use the following context to answer the question:
+Context:
 {context}
 
 Previous conversation:
 {chat_history}
 
-User question: {question}
+Question: {question}
 
-Provide a helpful, specific response based on the context above."""
+Answer:"""
         )
 
         chain = ConversationalRetrievalChain.from_llm(
@@ -111,8 +112,13 @@ Provide a helpful, specific response based on the context above."""
         try:
             result = await chain.ainvoke(
                 {"question": message},
-                config={"timeout": 60}  # 60 second timeout per request
+                config={"timeout": 30}  # 30 second timeout per request
             )
+        except asyncio.TimeoutError:
+            return {
+                "answer": "Response generation timed out. The query may be too complex.",
+                "sources": []
+            }
         except Exception as e:
             return {
                 "answer": f"Error processing your request: {str(e)}",
