@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from app.agents.travel_agent import TravelAgent
 from app.dependencies.auth import require_api_key
 import json
+import asyncio
 from app.dependencies.rate_limit import check_rate_limit
 
 router = APIRouter(prefix="/agent", tags=["agent"])
@@ -32,10 +33,25 @@ async def agent_chat(request: AgentRequest) -> AgentResponse:
             detail=str(e),
         )
 
-    result = await travel_agent.chat(
-        session_id=request.session_id,
-        message=request.message,
-    )
+    try:
+        # 45 second timeout for the entire chat operation
+        result = await asyncio.wait_for(
+            travel_agent.chat(
+                session_id=request.session_id,
+                message=request.message,
+            ),
+            timeout=45.0
+        )
+    except asyncio.TimeoutError:
+        raise HTTPException(
+            status_code=status.HTTP_504_GATEWAY_TIMEOUT,
+            detail="Response took too long to generate. Please try a simpler question.",
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error processing request: {str(e)}",
+        )
 
     print(json.dumps({
         "event": "agent_chat",
