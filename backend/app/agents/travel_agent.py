@@ -25,7 +25,7 @@ class TravelAgent:
             base_url=settings.ollama_base_url,
             model="llama3.2:3b",
             temperature=0.3,
-            num_predict=128,
+            num_predict=512,
         )
 
         embeddings = OllamaEmbeddings(
@@ -49,7 +49,7 @@ class TravelAgent:
 
     def _build_chain(self, session_id: str) -> ConversationalRetrievalChain:
         memory = _get_memory(session_id)
-        retriever = self.vectorstore.as_retriever(search_kwargs={"k": 2})
+        retriever = self.vectorstore.as_retriever(search_kwargs={"k": 5})
 
         return ConversationalRetrievalChain.from_llm(
             llm=self.llm,
