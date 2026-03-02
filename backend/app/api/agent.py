@@ -33,13 +33,13 @@ async def agent_chat(request: AgentRequest) -> AgentResponse:
         )
 
     try:
-        # 90 second timeout - plenty of time for LLM response
+        # 180 second timeout — headroom for CPU inference + cold model load
         result = await asyncio.wait_for(
             travel_agent.chat(
                 session_id=request.session_id,
                 message=request.message,
             ),
-            timeout=90.0
+            timeout=180.0
         )
     except asyncio.TimeoutError:
         raise HTTPException(
