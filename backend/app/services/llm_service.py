@@ -1,22 +1,16 @@
-import httpx
+from langchain_xai import ChatXAI
 from app.config import settings
 
 class LLMService:
-    async def generate(self, prompt: str) -> str:
-        timeout = httpx.Timeout(120.0)
+    def __init__(self):
+        self.llm = ChatXAI(
+            xai_api_key=settings.xai_api_key,
+            model="grok-2-latest",
+            temperature=0.3,
+            max_tokens=300,
+        )
 
-        async with httpx.AsyncClient(timeout=timeout) as client:
-            response = await client.post(
-                f"{settings.ollama_base_url}/api/generate",
-                json={
-                    "model": "mistral",
-                    "prompt": prompt,
-                    "stream": False,
-                    "options": {
-                        "temperature": 0.3,
-                        "num_predict": 300
-                    }
-                }
-            )
-            response.raise_for_status()
-            return response.json()["response"]
+    async def generate(self, prompt: str) -> str:
+        # ChatXAI.ainvoke returns an AIMessage, we just want the string content
+        response = await self.llm.ainvoke(prompt)
+        return response.content

@@ -7,26 +7,27 @@ from bs4 import BeautifulSoup
 from app.services.embedding_service import EmbeddingService
 from app.services.vector_service import VectorService
 
-# Wikipedia pages are reliable, open, and content-rich
+# Magical Kenya pages for authoritative tourism data
 TARGET_URLS = [
     # National Parks
-    ("https://en.wikipedia.org/wiki/Nairobi_National_Park",       "Nairobi National Park",    "Nairobi"),
-    ("https://en.wikipedia.org/wiki/Maasai_Mara",                 "Maasai Mara",               "Narok"),
-    ("https://en.wikipedia.org/wiki/Amboseli_National_Park",      "Amboseli National Park",    "Kajiado"),
-    ("https://en.wikipedia.org/wiki/Tsavo_East_National_Park",    "Tsavo East National Park",  "Taita-Taveta"),
-    ("https://en.wikipedia.org/wiki/Tsavo_West_National_Park",    "Tsavo West National Park",  "Taita-Taveta"),
-    ("https://en.wikipedia.org/wiki/Lake_Nakuru_National_Park",   "Lake Nakuru National Park", "Nakuru"),
-    ("https://en.wikipedia.org/wiki/Aberdare_National_Park",      "Aberdare National Park",    "Nyeri"),
-    ("https://en.wikipedia.org/wiki/Meru_National_Park",          "Meru National Park",        "Meru"),
-    ("https://en.wikipedia.org/wiki/Hell%27s_Gate_National_Park", "Hell's Gate National Park", "Nakuru"),
-    ("https://en.wikipedia.org/wiki/Samburu_National_Reserve",    "Samburu National Reserve",  "Samburu"),
+    ("https://magicalkenya.com/places-to-visit/national-parks/nairobi-national-park/", "Nairobi National Park", "Nairobi"),
+    ("https://magicalkenya.com/places-to-visit/national-parks/maasai-mara-national-reserve/", "Maasai Mara", "Narok"),
+    ("https://magicalkenya.com/places-to-visit/national-parks/amboseli-national-park/", "Amboseli National Park", "Kajiado"),
+    ("https://magicalkenya.com/places-to-visit/national-parks/tsavo-east-national-park/", "Tsavo East National Park", "Taita-Taveta"),
+    ("https://magicalkenya.com/places-to-visit/national-parks/tsavo-west-national-park/", "Tsavo West National Park", "Taita-Taveta"),
+    ("https://magicalkenya.com/places-to-visit/national-parks/lake-nakuru-national-park/", "Lake Nakuru National Park", "Nakuru"),
+    ("https://magicalkenya.com/places-to-visit/national-parks/aberdare-national-park/", "Aberdare National Park", "Nyeri"),
+    ("https://magicalkenya.com/places-to-visit/national-parks/meru-national-park/", "Meru National Park", "Meru"),
+    ("https://magicalkenya.com/places-to-visit/national-parks/hells-gate-national-park/", "Hell's Gate National Park", "Nakuru"),
+    ("https://magicalkenya.com/places-to-visit/national-parks/samburu-national-reserve/", "Samburu National Reserve", "Samburu"),
+    
     # Beaches & Coast
-    ("https://en.wikipedia.org/wiki/Diani_Beach",                 "Diani Beach",               "Kwale"),
-    ("https://en.wikipedia.org/wiki/Watamu",                      "Watamu Beach",              "Kilifi"),
-    ("https://en.wikipedia.org/wiki/Lamu",                        "Lamu Island",               "Lamu"),
+    ("https://magicalkenya.com/places-to-visit/beaches/diani-beach/", "Diani Beach", "Kwale"),
+    ("https://magicalkenya.com/places-to-visit/beaches/watamu/", "Watamu Beach", "Kilifi"),
+    ("https://magicalkenya.com/places-to-visit/beaches/lamu/", "Lamu Island", "Lamu"),
+    
     # Conservancies
-    ("https://en.wikipedia.org/wiki/Ol_Pejeta_Conservancy",       "Ol Pejeta Conservancy",     "Laikipia"),
-    ("https://en.wikipedia.org/wiki/Mount_Kenya_National_Park",   "Mount Kenya National Park", "Nyeri"),
+    ("https://magicalkenya.com/places-to-visit/conservancies/ol-pejeta-conservancy/", "Ol Pejeta Conservancy", "Laikipia"),
 ]
 
 HEADERS = {
@@ -60,18 +61,14 @@ async def fetch_with_retry(client: httpx.AsyncClient, url: str, retries: int = 3
 
 
 def extract_text(soup: BeautifulSoup) -> str:
-    """Extract clean text — Wikipedia-aware, falls back to paragraphs."""
-    # Wikipedia main content
-    content = soup.select_one("#mw-content-text .mw-parser-output")
-    if content:
-        # Remove tables, navboxes, references
-        for tag in content.select("table, .navbox, .reflist, sup, .mw-editsection"):
-            tag.decompose()
-        return content.get_text(separator=" ", strip=True)
-
-    # Generic fallback
-    for tag in soup.select("main, article"):
-        return tag.get_text(separator=" ", strip=True)
+    # Attempt to find standard main content areas
+    for selector in ["article", "main", ".post-content", ".entry-content"]:
+        content = soup.select_one(selector)
+        if content:
+            # strip out common noisy elements
+            for tag in content.select("nav, footer, .sidebar, script, style"):
+                tag.decompose()
+            return content.get_text(separator=" ", strip=True)
 
     paragraphs = soup.find_all("p")
     return " ".join(p.get_text() for p in paragraphs)
