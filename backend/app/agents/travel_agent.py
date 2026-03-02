@@ -30,7 +30,7 @@ Answer:""",
 )
 
 
-from langchain_xai import ChatXAI
+from langchain_groq import ChatGroq
 
 def _get_history(session_id: str) -> deque:
     if session_id not in _session_histories:
@@ -49,9 +49,9 @@ def _format_history(history: deque) -> str:
 
 class TravelAgent:
     def __init__(self):
-        self.llm = ChatXAI(
-            xai_api_key=settings.xai_api_key,
-            model="grok-2-latest",
+        self.llm = ChatGroq(
+            api_key=settings.groq_api_key,
+            model="llama-3.1-8b-instant",
             temperature=0.1,
             max_tokens=400,
         )
