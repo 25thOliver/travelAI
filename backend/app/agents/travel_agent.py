@@ -50,9 +50,9 @@ class TravelAgent:
     def __init__(self):
         self.llm = OllamaLLM(
             base_url=settings.ollama_base_url,
-            model="mistral:latest",
+            model="llama3.2:3b",
             temperature=0.1,
-            num_predict=300,
+            num_predict=400,
             top_p=0.7,
             top_k=30,
         )
