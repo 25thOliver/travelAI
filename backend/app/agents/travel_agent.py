@@ -97,7 +97,8 @@ class TravelAgent:
         )
 
         try:
-            answer: str = await self.llm.ainvoke(prompt)
+            response = await self.llm.ainvoke(prompt)
+            answer = response.content
         except Exception as e:
             return {"answer": f"Error generating response: {str(e)}", "sources": []}
 
