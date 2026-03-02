@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     qdrant_port: int
     ollama_base_url: str
     api_key: str
-    xai_api_key: str  # For Grok integration
+    groq_api_key: str
 
     model_config = SettingsConfigDict(
         env_file=".env",
