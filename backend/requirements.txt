@@ -10,7 +10,7 @@ pydantic
 qdrant-client
 langchain==0.3.7
 langchain-community==0.3.7
-langchain-xai
+langchain-groq
 ollama
 redis
 celery
