@@ -1,4 +1,4 @@
-from langchain_ollama import OllamaLLM, OllamaEmbeddings
+from langchain_ollama import OllamaEmbeddings
 from langchain_qdrant import QdrantVectorStore
 from langchain.prompts import PromptTemplate
 from langchain.schema import Document
@@ -30,11 +30,12 @@ Answer:""",
 )
 
 
+from langchain_xai import ChatXAI
+
 def _get_history(session_id: str) -> deque:
     if session_id not in _session_histories:
         _session_histories[session_id] = deque(maxlen=3)  # keep last 3 turns
     return _session_histories[session_id]
-
 
 def _format_history(history: deque) -> str:
     if not history:
@@ -48,13 +49,11 @@ def _format_history(history: deque) -> str:
 
 class TravelAgent:
     def __init__(self):
-        self.llm = OllamaLLM(
-            base_url=settings.ollama_base_url,
-            model="llama3.2:3b",
+        self.llm = ChatXAI(
+            xai_api_key=settings.xai_api_key,
+            model="grok-2-latest",
             temperature=0.1,
-            num_predict=400,
-            top_p=0.7,
-            top_k=30,
+            max_tokens=400,
         )
 
         self.embeddings = OllamaEmbeddings(
