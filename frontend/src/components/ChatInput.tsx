@@ -40,8 +40,8 @@ export function ChatInput({ onSend, disabled }: Props) {
   };
 
   return (
-    <div className="border-t border-border bg-card p-4">
-      <div className="max-w-3xl mx-auto flex gap-3 items-end">
+    <div className="w-full pb-4">
+      <div className="flex gap-3 items-end bg-card/80 backdrop-blur-xl border border-white/10 p-3 rounded-3xl shadow-2xl transition-all duration-300 focus-within:border-primary/50 focus-within:shadow-glow">
         <textarea
           ref={textareaRef}
           value={value}
@@ -51,14 +51,14 @@ export function ChatInput({ onSend, disabled }: Props) {
           placeholder="Ask about a destination..."
           rows={1}
           disabled={disabled}
-          className="flex-1 resize-none rounded-lg bg-secondary border border-border px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-shadow scrollbar-thin disabled:opacity-50"
+          className="flex-1 resize-none bg-transparent border-0 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-0 min-h-[44px] max-h-[160px] scrollbar-thin transition-opacity disabled:opacity-50"
         />
         <button
           onClick={handleSubmit}
           disabled={disabled || !value.trim()}
-          className="flex-shrink-0 h-11 w-11 rounded-lg bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="flex-shrink-0 h-11 w-11 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105 active:scale-95"
         >
-          <Send className="w-4 h-4" />
+          <Send className="w-4 h-4 ml-0.5" />
         </button>
       </div>
     </div>

@@ -39,23 +39,11 @@ export function StatusIndicator({ status, error }: Props) {
   }
 
   return (
-    <div className="space-y-2 text-xs">
-      <div className="flex items-center gap-2 text-muted-foreground">
+    <div className="flex items-center gap-2 text-xs">
+      <div className="flex items-center gap-2 text-muted-foreground bg-secondary/50 px-2.5 py-1.5 rounded-full">
         <StatusDot ok={status.status === "ok"} />
-        <Activity className="w-3 h-3" />
-        <span>Up {formatUptime(status.uptime_seconds)}</span>
-      </div>
-      <div className="flex gap-3">
-        <span className="flex items-center gap-1.5 text-muted-foreground">
-          <StatusDot ok={status.dependencies.database === "ok"} />
-          <Database className="w-3 h-3" />
-          DB
-        </span>
-        <span className="flex items-center gap-1.5 text-muted-foreground">
-          <StatusDot ok={status.dependencies.redis === "ok"} />
-          <Server className="w-3 h-3" />
-          Redis
-        </span>
+        <Activity className="w-3 h-3 text-success" />
+        <span className="font-medium tracking-wide">System Online</span>
       </div>
     </div>
   );

@@ -9,22 +9,22 @@ interface Props {
 function renderMarkdown(text: string) {
   // Replace bold text (**text**)
   text = text.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
-  
+
   // Replace italic text (*text* but not ** or **)
   text = text.replace(/\*([^*]+)\*/g, "<em>$1</em>");
-  
+
   // Replace headers (# Header)
   text = text.replace(/^### ([^\n]+)/gm, "<h3 className='font-semibold text-sm mt-3 mb-1'>$1</h3>");
   text = text.replace(/^## ([^\n]+)/gm, "<h2 className='font-bold text-base mt-3 mb-2'>$1</h2>");
   text = text.replace(/^# ([^\n]+)/gm, "<h1 className='font-bold text-lg mt-3 mb-2'>$1</h1>");
-  
+
   // Replace bullet lists (* item)
   text = text.replace(/^\* ([^\n]+)/gm, "<li className='ml-4'>$1</li>");
   text = text.replace(/(<li[^>]*>.*?<\/li>)/s, "<ul className='list-disc'>$1</ul>");
-  
+
   // Replace line breaks
   text = text.replace(/\n\n/g, "</p><p>");
-  
+
   return text;
 }
 
@@ -47,9 +47,10 @@ export function ChatMessage({ message }: Props) {
   const renderedContent = renderMarkdown(message.content);
 
   return (
-    <div className={`flex gap-3 animate-fade-in px-4 py-3 ${isUser ? "" : "bg-chat-assistant"}`}>
+    <div className={`flex gap-4 animate-fade-in px-4 py-6 ${isUser ? "" : "bg-card/30 rounded-2xl my-2 border border-white/5 shadow-sm"}`}>
       <div
-        className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center`}
+        className={`flex-shrink-0 w-8 h-8 rounded-xl flex items-center justify-center shadow-sm ${isUser ? "bg-secondary border border-border" : "bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20"
+          }`}
       >
         {isUser ? (
           <User className="w-4 h-4 text-secondary-foreground" />
@@ -57,9 +58,9 @@ export function ChatMessage({ message }: Props) {
           <Compass className="w-4 h-4 text-primary" />
         )}
       </div>
-      <div className="flex-1 min-w-0 space-y-2">
-        <div 
-          className="text-sm leading-relaxed" 
+      <div className="flex-1 min-w-0 space-y-3 pt-1">
+        <div
+          className="text-sm leading-relaxed"
           dangerouslySetInnerHTML={{ __html: renderedContent }}
         />
         {message.sources && message.sources.length > 0 && (
