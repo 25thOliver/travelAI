@@ -1,4 +1,4 @@
-# 🌍 Travel AI
+# Travel AI
 
 > Your intelligent, blazing-fast travel companion for exploring Magical Kenya.
 
@@ -6,7 +6,7 @@ Travel AI is a modern full-stack application designed to help users plan trips, 
 
 ---
 
-## 🧭 For Non-Technical Readers: What is Travel AI?
+## For Non-Technical Readers: What is Travel AI?
 
 Imagine having a local Kenyan tour guide available 24/7. Travel AI is exactly that—a smart chat assistant that knows the ins and outs of Kenya's best destinations, from the white sands of Diani Beach to the wildlife of the Maasai Mara.
 
@@ -17,11 +17,11 @@ Imagine having a local Kenyan tour guide available 24/7. Travel AI is exactly th
 
 ---
 
-## 💻 For Developers: Technical Overview
+## For Developers: Technical Overview
 
 Travel AI is a Retrieval-Augmented Generation (RAG) application leveraging a modern, containerized microservices architecture.
 
-### 🏗️ The Tech Stack
+### The Tech Stack
 
 - **Frontend**: React, TypeScript, TailwindCSS, Vite (with a custom Glassmorphic UI)
 - **Backend API**: Python, FastAPI
@@ -31,14 +31,14 @@ Travel AI is a Retrieval-Augmented Generation (RAG) application leveraging a mod
 - **Relational DB**: **PostgreSQL** for application state and future user management.
 - **Infrastructure**: Fully containerized using **Docker** and orchestrated via `docker-compose.yml`, fronted by **Nginx**.
 
-### ⚙️ How it Works
+### How it Works
 1. **Data Ingestion (`/scrape`)**: The backend scrapes official destination pages from `magicalkenya.com`, chunks the HTML text, converts them to vector embeddings using Ollama, and upserts them into Qdrant.
 2. **Retrieval (RAG)**: When a user asks a question, the query is embedded and matched against Qdrant to find the most relevant Magical Kenya context.
 3. **Generation**: The context and the user's prompt are sent to the Groq API, which streams back a highly accurate, context-aware markdown response to the React frontend.
 
 ---
 
-## 🚀 Getting Started (Local Development)
+## Getting Started (Local Development)
 
 ### Prerequisites
 - Docker and Docker Compose
@@ -78,7 +78,7 @@ Travel AI is a Retrieval-Augmented Generation (RAG) application leveraging a mod
 
 ---
 
-## 🌐 Deployment instructions
+## Deployment instructions
 
 To share this app publicly, the easiest method is deploying the entire Docker stack to a single Virtual Private Server (VPS) like a DigitalOcean Droplet, Hetzner, or AWS EC2 instance. 
 
@@ -91,4 +91,3 @@ Because local `Ollama` is required for the embeddings, standard serverless platf
 5. Your app will automatically be served on port `80` via the included Nginx container, making it accessible via your server's public IP Address!
 
 ---
-*Built with ❤️ for exploring Kenya.*
