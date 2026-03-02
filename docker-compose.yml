@@ -8,7 +8,6 @@ services:
     depends_on:
       - postgres
       - qdrant
-      - redis
       - ollama
     env_file:
       - .env
@@ -35,24 +34,6 @@ services:
       - "6333:6333"
     volumes:
       - qdrant_data:/qdrant/storage
-
-  redis:
-    image: redis:7
-    container_name: travel_redis
-    ports:
-      - "6379:6379"
-
-  celery_worker:
-    build: ./backend
-    container_name: travel_celery
-    command: celery -A app.celery_app worker --loglevel=info
-    depends_on:
-      - redis
-      - postgres
-    env_file:
-      - .env
-    volumes:
-      - ./backend:/app
 
   ollama:
     image: ollama/ollama:latest
